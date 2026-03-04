@@ -168,9 +168,26 @@ def dashboard():
         "SELECT * FROM lists WHERE user_id = ? ORDER BY id DESC",
         (current_user_id(),)
     )
+
     lists = cur.fetchall()
     conn.close()
-    return render_template("dashboard.html", lists=lists)
+
+    pretty_lists = []
+    for l in lists:
+        created = l["created_at"]
+        try:
+            dt = datetime.fromisoformat(created.replace("Z", ""))
+            created_pretty = dt.strftime("%d.%m.%Y %H:%M")
+        except Exception:
+            created_pretty = created
+
+        pretty_lists.append({
+            "id": l["id"],
+            "name": l["name"],
+            "created_at": created_pretty
+        })
+
+    return render_template("dashboard.html", lists=pretty_lists)
 
 
 @app.route("/lists/create", methods=["POST"])
