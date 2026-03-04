@@ -1,0 +1,93 @@
+{% extends "_base.html" %}
+{% set title = lst.name %}
+
+{% block content %}
+  <div class="card">
+    <div class="row">
+      <div>
+        <div class="h1">{{ lst.name }}</div>
+        <div class="muted">Lista ta de cumpărături</div>
+      </div>
+      <div class="spacer"></div>
+      <a class="btn" href="{{ url_for('dashboard') }}">← Dashboard</a>
+      <a class="btn" href="{{ url_for('export_list_csv', list_id=lst.id) }}">Export CSV</a>
+    </div>
+
+    <div class="card" style="background: rgba(15,23,42,.55);">
+      <div class="h2">Adaugă produs</div>
+      <form method="post" action="{{ url_for('add_item', list_id=lst.id) }}" class="row">
+        <input name="name" placeholder="Produs (ex: lapte)" />
+        <input name="qty" placeholder="Cantitate (ex: 2)" />
+        <input name="unit" placeholder="Unitate (ex: L, kg)" />
+        <input name="category" placeholder="Categorie (ex: lactate)" />
+        <button class="btn primary" type="submit">Add</button>
+      </form>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for m in messages %}
+            <div class="flash">{{ m }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="row" style="margin-top:12px;">
+      <a class="btn {% if only_pending %}primary{% endif %}" href="{{ url_for('view_list', list_id=lst.id, only_pending=1) }}">Doar necumpărate</a>
+      <a class="btn {% if not only_pending and not selected_category %}primary{% endif %}" href="{{ url_for('view_list', list_id=lst.id) }}">Toate</a>
+
+      <form method="get" action="{{ url_for('view_list', list_id=lst.id) }}" class="row">
+        <select name="category">
+          <option value="">(toate categoriile)</option>
+          {% for c in categories %}
+            <option value="{{ c }}" {% if c == selected_category %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+        {% if only_pending %}<input type="hidden" name="only_pending" value="1">{% endif %}
+        <button class="btn" type="submit">Apply</button>
+      </form>
+    </div>
+
+    <div style="margin-top:14px;">
+      <table class="table">
+        <tr>
+          <th>Status</th>
+          <th>Produs</th>
+          <th>Cantitate</th>
+          <th>Categorie</th>
+          <th>Acțiuni</th>
+        </tr>
+
+        {% for it in items %}
+          <tr>
+            <td>
+              {% if it.purchased %}
+                <span class="badge ok">✔ Cumpărat</span>
+              {% else %}
+                <span class="badge no">✖ Necumpărat</span>
+              {% endif %}
+            </td>
+            <td><b>{{ it.name }}</b></td>
+            <td>
+              {% if it.qty is not none %}{{ it.qty }}{% endif %}
+              {% if it.unit %} {{ it.unit }}{% endif %}
+            </td>
+            <td>{{ it.category or "-" }}</td>
+            <td>
+              <div class="actions">
+                <form method="post" action="{{ url_for('toggle_item', item_id=it.id) }}">
+                  <button class="btn success" type="submit">{{ "Uncheck" if it.purchased else "Done" }}</button>
+                </form>
+                <form method="post" action="{{ url_for('delete_item', item_id=it.id) }}">
+                  <button class="btn danger" type="submit">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="muted">Nu ai produse în listă.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+{% endblock %}

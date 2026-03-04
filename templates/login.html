@@ -1,0 +1,23 @@
+{% extends "_base.html" %}
+{% set title = "Login" %}
+
+{% block content %}
+  <div class="card">
+    <div class="h1">Login</div>
+    <p class="muted">Intră în contul tău.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" class="row" style="margin-top:12px;">
+      <input name="username" placeholder="Username" />
+      <input name="password" type="password" placeholder="Password" />
+      <button class="btn primary" type="submit">Login</button>
+    </form>
+  </div>
+{% endblock %}

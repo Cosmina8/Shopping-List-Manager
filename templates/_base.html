@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>{{ title or "Shopping List Manager" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="brand">🛒 Shopping List Manager</div>
+      <div class="right">
+        {% if session.get("username") %}
+          <span class="pill">Logat ca <b>{{ session.username }}</b></span>
+          <a class="btn" href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+          <a class="btn" href="{{ url_for('login') }}">Login</a>
+          <a class="btn primary" href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% set title = "Welcome" %}
+
+{% block content %}
+  <div class="card">
+    <div class="h1">Bine ai venit 👋</div>
+    <p class="muted">Gestionează liste de cumpărături, categorii și export CSV.</p>
+    <div class="row">
+      <a class="btn primary" href="{{ url_for('login') }}">Login</a>
+      <a class="btn" href="{{ url_for('register') }}">Register</a>
+    </div>
+  </div>
+{% endblock %}

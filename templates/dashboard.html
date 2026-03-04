@@ -1,0 +1,39 @@
+{% extends "_base.html" %}
+{% set title = "Dashboard" %}
+
+{% block content %}
+  <div class="card">
+    <div class="h1">Dashboard</div>
+    <p class="muted">Creează și gestionează listele tale.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card" style="background: rgba(15,23,42,.55);">
+      <div class="h2">Creează listă nouă</div>
+      <form method="post" action="{{ url_for('create_list') }}" class="row">
+        <input name="name" placeholder="Ex: Săptămâna 1" />
+        <button class="btn primary" type="submit">Create</button>
+      </form>
+    </div>
+
+    <div class="h2" style="margin-top:16px;">Listele mele</div>
+    <div class="card" style="background: rgba(15,23,42,.55);">
+      <ul style="margin:0; padding-left:18px;">
+        {% for l in lists %}
+          <li style="margin:8px 0;">
+            <a href="{{ url_for('view_list', list_id=l.id) }}"><b>{{ l.name }}</b></a>
+            <span class="muted"> • {{ l.created_at }}</span>
+          </li>
+        {% else %}
+          <li class="muted">Nu ai liste încă.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock %}
