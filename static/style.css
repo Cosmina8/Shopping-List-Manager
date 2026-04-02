@@ -164,3 +164,20 @@ input::placeholder{ color: rgba(156,163,175,.8); }
 .actions{
   display:flex; gap:8px; flex-wrap:wrap;
 }
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #1e293b;
+  border-radius: 10px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}

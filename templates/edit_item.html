@@ -1,0 +1,33 @@
+{% extends "_base.html" %}
+{% set title = "Edit product" %}
+
+{% block content %}
+  <div class="card">
+    <div class="row">
+      <div>
+        <div class="h1">Editează produs</div>
+        <div class="muted">{{ item.name }}</div>
+      </div>
+      <div class="spacer"></div>
+      <a class="btn" href="{{ url_for('view_list', list_id=list_id) }}">← Înapoi</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card" style="background: rgba(15,23,42,.55); margin-top:16px;">
+      <form method="post" class="row">
+        <input name="name" value="{{ item.name }}" required />
+        <input name="qty" value="{{ item.qty if item.qty is not none else '' }}" placeholder="Cantitate" />
+        <input name="unit" value="{{ item.unit or '' }}" placeholder="Unitate" />
+        <input name="category" value="{{ item.category or '' }}" placeholder="Categorie" />
+        <button class="btn primary" type="submit">💾 Save</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
