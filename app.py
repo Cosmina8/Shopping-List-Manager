@@ -191,6 +191,7 @@ def dashboard():
 
 
 @app.route("/lists/create", methods=["POST"])
+
 @login_required
 def create_list():
     name = request.form.get("name", "").strip()
@@ -206,6 +207,33 @@ def create_list():
     )
     conn.commit()
     conn.close()
+
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/lists/<int:list_id>/delete", methods=["POST"])
+@login_required
+def delete_list(list_id: int):
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT id FROM lists WHERE id = ? AND user_id = ?",
+        (list_id, current_user_id())
+    )
+    lst = cur.fetchone()
+
+    if not lst:
+        conn.close()
+        flash("Lista nu există sau nu ai acces.")
+        return redirect(url_for("dashboard"))
+
+    cur.execute("DELETE FROM items WHERE list_id = ?", (list_id,))
+    cur.execute("DELETE FROM lists WHERE id = ?", (list_id,))
+    conn.commit()
+    conn.close()
+
+    flash("Lista a fost ștearsă.")
     return redirect(url_for("dashboard"))
 
 
@@ -305,14 +333,14 @@ def toggle_item(item_id: int):
     conn = get_db()
     cur = conn.cursor()
 
-    # ownership prin join
     cur.execute("""
-        SELECT items.id, items.purchased
+        SELECT items.id, items.purchased, items.list_id
         FROM items
         JOIN lists ON lists.id = items.list_id
         WHERE items.id = ? AND lists.user_id = ?
     """, (item_id, current_user_id()))
     row = cur.fetchone()
+
     if not row:
         conn.close()
         flash("Item inexistent sau fără acces.")
@@ -322,10 +350,7 @@ def toggle_item(item_id: int):
     cur.execute("UPDATE items SET purchased = ? WHERE id = ?", (new_val, item_id))
     conn.commit()
 
-    # ca să ne întoarcem în listă
-    cur.execute("SELECT list_id FROM items WHERE id = ?", (item_id,))
-    list_id = cur.fetchone()["list_id"]
-
+    list_id = row["list_id"]
     conn.close()
     return redirect(url_for("view_list", list_id=list_id))
 
@@ -335,7 +360,61 @@ def toggle_item(item_id: int):
 def delete_item(item_id: int):
     conn = get_db()
     cur = conn.cursor()
+@app.route("/items/<int:item_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_item(item_id: int):
+    conn = get_db()
+    cur = conn.cursor()
 
+    cur.execute("""
+        SELECT items.*, lists.user_id
+        FROM items
+        JOIN lists ON lists.id = items.list_id
+        WHERE items.id = ?
+    """, (item_id,))
+    item = cur.fetchone()
+
+    if not item or item["user_id"] != current_user_id():
+        conn.close()
+        flash("Produs inexistent sau fără acces.")
+        return redirect(url_for("dashboard"))
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        qty_raw = request.form.get("qty", "").strip()
+        unit = request.form.get("unit", "").strip()
+        category = request.form.get("category", "").strip()
+
+        if not name:
+            flash("Numele produsului este obligatoriu.")
+            conn.close()
+            return redirect(url_for("edit_item", item_id=item_id))
+
+        qty = None
+        if qty_raw:
+            try:
+                qty = float(qty_raw.replace(",", "."))
+            except ValueError:
+                flash("Cantitatea trebuie să fie număr.")
+                conn.close()
+                return redirect(url_for("edit_item", item_id=item_id))
+
+        cur.execute("""
+            UPDATE items
+            SET name = ?, qty = ?, unit = ?, category = ?
+            WHERE id = ?
+        """, (name, qty, unit, category, item_id))
+
+        conn.commit()
+        list_id = item["list_id"]
+        conn.close()
+
+        flash("Produs actualizat.")
+        return redirect(url_for("view_list", list_id=list_id))
+
+    list_id = item["list_id"]
+    conn.close()
+    return render_template("edit_item.html", item=item, list_id=list_id)
     cur.execute("""
         SELECT items.list_id
         FROM items

@@ -7,6 +7,22 @@
       <div>
         <div class="h1">{{ lst.name }}</div>
         <div class="muted">Lista ta de cumpărături</div>
+        {% set total = items|length %}
+        {% set done = items|selectattr("purchased")|list|length %}
+
+        {% if total > 0 %}
+  <div style="margin-top: 10px;">
+    <div style="font-size:14px; color:#94a3b8;">
+      Progres: {{ done }} / {{ total }} ({{ (done / total * 100)|round(0) }}%)
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress"
+           style="width: {{ (done / total * 100) }}%">
+      </div>
+    </div>
+  </div>
+{% endif %}
       </div>
       <div class="spacer"></div>
       <a class="btn" href="{{ url_for('dashboard') }}">← Dashboard</a>
@@ -50,44 +66,58 @@
 
     <div style="margin-top:14px;">
       <table class="table">
-        <tr>
-          <th>Status</th>
-          <th>Produs</th>
-          <th>Cantitate</th>
-          <th>Categorie</th>
-          <th>Acțiuni</th>
-        </tr>
+  <tr>
+    <th>Status</th>
+    <th>Produs</th>
+    <th>Cantitate</th>
+    <th>Categorie</th>
+    <th>Acțiuni</th>
+  </tr>
 
-        {% for it in items %}
-          <tr>
-            <td>
-              {% if it.purchased %}
-                <span class="badge ok">✔ Cumpărat</span>
-              {% else %}
-                <span class="badge no">✖ Necumpărat</span>
-              {% endif %}
-            </td>
-            <td><b>{{ it.name }}</b></td>
-            <td>
-              {% if it.qty is not none %}{{ it.qty }}{% endif %}
-              {% if it.unit %} {{ it.unit }}{% endif %}
-            </td>
-            <td>{{ it.category or "-" }}</td>
-            <td>
-              <div class="actions">
-                <form method="post" action="{{ url_for('toggle_item', item_id=it.id) }}">
-                  <button class="btn success" type="submit">{{ "Uncheck" if it.purchased else "Done" }}</button>
-                </form>
-                <form method="post" action="{{ url_for('delete_item', item_id=it.id) }}">
-                  <button class="btn danger" type="submit">Delete</button>
-                </form>
-              </div>
-            </td>
-          </tr>
+  {% for it in items %}
+    <tr>
+      <td>
+        {% if it.purchased %}
+          <span class="badge ok">✔ Cumpărat</span>
         {% else %}
-          <tr><td colspan="5" class="muted">Nu ai produse în listă.</td></tr>
-        {% endfor %}
-      </table>
+          <span class="badge no">✖ Necumpărat</span>
+        {% endif %}
+      </td>
+
+      <td><b>{{ it.name }}</b></td>
+
+      <td>
+        {% if it.qty is not none %}{{ it.qty }}{% endif %}
+        {% if it.unit %} {{ it.unit }}{% endif %}
+      </td>
+
+      <td>{{ it.category or "-" }}</td>
+
+      <td>
+        <div class="actions">
+          <form method="post" action="{{ url_for('toggle_item', item_id=it.id) }}" style="display:inline;">
+            <button class="btn success" type="submit">
+              {{ "Uncheck" if it.purchased else "Done" }}
+            </button>
+          </form>
+
+          <a class="btn" href="{{ url_for('edit_item', item_id=it.id) }}">✏️ Edit</a>
+
+          <form method="post"
+                action="{{ url_for('delete_item', item_id=it.id) }}"
+                style="display:inline;"
+                onsubmit="return confirm('Sigur vrei să ștergi produsul: {{ it.name }} ?');">
+            <button class="btn danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </td>
+    </tr>
+  {% else %}
+    <tr>
+      <td colspan="5" class="muted">Nu ai produse în listă.</td>
+    </tr>
+  {% endfor %}
+</table>
     </div>
   </div>
 {% endblock %}

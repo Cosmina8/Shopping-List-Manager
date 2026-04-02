@@ -27,9 +27,16 @@
       <ul style="margin:0; padding-left:18px;">
         {% for l in lists %}
           <li style="margin:8px 0;">
-            <a href="{{ url_for('view_list', list_id=l.id) }}"><b>{{ l.name }}</b></a>
-            <span class="muted"> • {{ l.created_at }}</span>
-          </li>
+  <a href="{{ url_for('view_list', list_id=l.id) }}"><b>{{ l.name }}</b></a>
+  <span class="muted"> • {{ l.created_at }}</span>
+
+  <form method="post"
+        action="{{ url_for('delete_list', list_id=l.id) }}"
+        style="display:inline; margin-left:10px;"
+        onsubmit="return confirm('Sigur vrei să ștergi lista {{ l.name }} ?');">
+    <button class="btn danger" type="submit">🗑 Delete</button>
+  </form>
+</li>
         {% else %}
           <li class="muted">Nu ai liste încă.</li>
         {% endfor %}
