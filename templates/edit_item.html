@@ -26,6 +26,7 @@
         <input name="qty" value="{{ item.qty if item.qty is not none else '' }}" placeholder="Cantitate" />
         <input name="unit" value="{{ item.unit or '' }}" placeholder="Unitate" />
         <input name="category" value="{{ item.category or '' }}" placeholder="Categorie" />
+        <input name="price" value="{{ item.price if item.price is not none else '' }}" placeholder="Preț (ex: 4.50)" />
         <button class="btn primary" type="submit">💾 Save</button>
       </form>
     </div>
