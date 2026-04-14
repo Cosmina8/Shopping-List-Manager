@@ -26,17 +26,20 @@
     <div class="card" style="background: rgba(15,23,42,.55);">
       <ul style="margin:0; padding-left:18px;">
         {% for l in lists %}
-          <li style="margin:8px 0;">
-  <a href="{{ url_for('view_list', list_id=l.id) }}"><b>{{ l.name }}</b></a>
-  <span class="muted"> • {{ l.created_at }}</span>
-
-  <form method="post"
-        action="{{ url_for('delete_list', list_id=l.id) }}"
-        style="display:inline; margin-left:10px;"
-        onsubmit="return confirm('Sigur vrei să ștergi lista {{ l.name }} ?');">
-    <button class="btn danger" type="submit">🗑 Delete</button>
-  </form>
-</li>
+          <li class="list-item">
+            <div class="item-meta">
+              <a href="{{ url_for('view_list', list_id=l.id) }}"><b>{{ l.name }}</b></a>
+              <span class="muted"> • {{ l.created_at }} • {{ l.item_count }} {{ "produs" if l.item_count == 1 else "produse" }}</span>
+            </div>
+            <div class="item-actions">
+              <a class="btn" href="{{ url_for('edit_list', list_id=l.id) }}">✏️ Edit</a>
+              <form method="post"
+                    action="{{ url_for('delete_list', list_id=l.id) }}"
+                    onsubmit="return confirm('Sigur vrei să ștergi lista {{ l.name }} ?');">
+                <button class="btn danger" type="submit">🗑 Șterge</button>
+              </form>
+            </div>
+          </li>
         {% else %}
           <li class="muted">Nu ai liste încă.</li>
         {% endfor %}

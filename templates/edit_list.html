@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{% set title = "Editare listă" %}
+
+{% block content %}
+  <div class="card">
+    <div class="row">
+      <div>
+        <div class="h1">Editează lista</div>
+        <div class="muted">Modifică numele listei tale</div>
+      </div>
+      <div class="spacer"></div>
+      <a class="btn" href="{{ url_for('dashboard') }}">← Dashboard</a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="card" style="background: rgba(15,23,42,.55); margin-top: 16px;">
+      <form method="post" class="row">
+        <input name="name" value="{{ lst.name }}" placeholder="Numele listei" required />
+        <button class="btn primary" type="submit">Salvează</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
