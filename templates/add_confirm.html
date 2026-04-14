@@ -1,0 +1,76 @@
+{% extends "_base.html" %}
+{% set title = "Confirmare adăugare produs" %}
+
+{% block content %}
+  <div class="card">
+    <div class="h1">Produs deja existent</div>
+    <div class="muted">Ai încercat să adaugi un produs care există deja în listă. Ce vrei să faci?</div>
+
+    <div class="card" style="background: rgba(15,23,42,.55); margin-top: 20px;">
+      <div class="h2">Produs nou</div>
+      <table class="table">
+        <tr>
+          <th>Nume</th>
+          <th>Cantitate</th>
+          <th>Unitate</th>
+          <th>Categorie</th>
+          <th>Preț</th>
+        </tr>
+        <tr>
+          <td>{{ pending.name }}</td>
+          <td>{{ pending.qty or '-' }}</td>
+          <td>{{ pending.unit or '-' }}</td>
+          <td>{{ pending.category or '-' }}</td>
+          <td>{{ pending.price or '-' }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card" style="background: rgba(15,23,42,.55); margin-top: 20px;">
+      <div class="h2">Produse existente cu același nume</div>
+      <table class="table">
+        <tr>
+          <th>Nume</th>
+          <th>Cantitate</th>
+          <th>Unitate</th>
+          <th>Categorie</th>
+          <th>Preț</th>
+          <th>Status</th>
+        </tr>
+        {% for it in existing_items %}
+        <tr>
+          <td>{{ it.name }}</td>
+          <td>{{ it.qty or '-' }}</td>
+          <td>{{ it.unit or '-' }}</td>
+          <td>{{ it.category or '-' }}</td>
+          <td>{{ it.price or '-' }}</td>
+          <td>
+            {% if it.purchased %}
+              <span class="badge ok">✔ Cumpărat</span>
+            {% else %}
+              <span class="badge no">✖ Necumpărat</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    <form method="post" action="{{ url_for('add_confirm', list_id=list_id) }}" style="margin-top: 20px;">
+      <div class="row">
+        <button class="btn" type="submit" name="action" value="update">Actualizează primul existent</button>
+        <button class="btn" type="submit" name="action" value="combine">Combină cu primul existent (dacă e posibil)</button>
+        <button class="btn primary" type="submit" name="action" value="add_new">Adaugă oricum ca produs nou</button>
+        <a class="btn" href="{{ url_for('view_list', list_id=list_id) }}">Anulează</a>
+      </div>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+{% endblock %}

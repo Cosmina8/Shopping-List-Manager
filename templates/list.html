@@ -17,9 +17,19 @@
     </div>
 
     <div class="progress-bar">
-      <div class="progress"
-           style="width: {{ (done / total * 100) }}%">
-      </div>
+      <div class="progress" style="width: 0%;" data-width="{{ (done / total * 100)|round(0) }}"></div>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <div class="muted">Total estimat: {{ '%.2f'|format(total_cost) }} lei</div>
+      {% if category_subtotals %}
+      <div class="muted" style="margin-top:8px;">Subtotal pe categorii:</div>
+      <ul style="margin:6px 0 0 0; padding-left:18px; list-style: disc; color:#cbd5e1;">
+        {% for category, subtotal in category_subtotals.items() %}
+          <li>{{ category }}: {{ '%.2f'|format(subtotal) }} lei</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
     </div>
   </div>
 {% endif %}
@@ -36,6 +46,7 @@
         <input name="qty" placeholder="Cantitate (ex: 2)" />
         <input name="unit" placeholder="Unitate (ex: L, kg)" />
         <input name="category" placeholder="Categorie (ex: lactate)" />
+        <input name="price" placeholder="Preț (ex: 4.50)" />
         <button class="btn primary" type="submit">Add</button>
       </form>
 
@@ -65,14 +76,17 @@
     </div>
 
     <div style="margin-top:14px;">
-      <table class="table">
-  <tr>
-    <th>Status</th>
-    <th>Produs</th>
-    <th>Cantitate</th>
-    <th>Categorie</th>
-    <th>Acțiuni</th>
-  </tr>
+      <div class="table-wrap">
+        <table class="table">
+          <tr>
+            <th>Status</th>
+            <th>Produs</th>
+            <th>Cantitate</th>
+            <th>Categorie</th>
+            <th>Preț</th>
+            <th>Total</th>
+            <th>Acțiuni</th>
+          </tr>
 
   {% for it in items %}
     <tr>
@@ -92,6 +106,14 @@
       </td>
 
       <td>{{ it.category or "-" }}</td>
+
+      <td>
+        {% if it.price is not none %}{{ '%.2f'|format(it.price) }}{% else %}-{% endif %}
+      </td>
+
+      <td>
+        {% if it.price is not none and it.qty is not none %}{{ '%.2f'|format(it.price * it.qty) }}{% else %}-{% endif %}
+      </td>
 
       <td>
         <div class="actions">
@@ -114,10 +136,19 @@
     </tr>
   {% else %}
     <tr>
-      <td colspan="5" class="muted">Nu ai produse în listă.</td>
+      <td colspan="7" class="muted">Nu ai produse în listă.</td>
     </tr>
   {% endfor %}
-</table>
+        </table>
+      </div>
     </div>
   </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.progress[data-width]').forEach(function (el) {
+      el.style.width = el.dataset.width + '%';
+    });
+  });
+</script>
 {% endblock %}
