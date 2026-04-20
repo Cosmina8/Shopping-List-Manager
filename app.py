@@ -4,6 +4,8 @@ import sqlite3
 from functools import wraps
 from datetime import datetime
 
+from firebase_config import db
+
 from flask import (
     Flask, render_template, request, redirect, url_for,
     session, flash, send_file
