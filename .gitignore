@@ -3,3 +3,4 @@ __pycache__/
 database.db
 *.csv
 *.pyc
+firebase_service_account.json
