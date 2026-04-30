@@ -397,12 +397,18 @@ def add_confirm(list_id: str):
         elif action == "combine":
             if existing_items:
                 combinable = None
+                normalized_pending_unit = (pending["unit"] or "").strip().lower()
+                normalized_pending_category = (pending["category"] or "").strip().lower()
+
                 for existing in existing_items:
+                    existing_unit = (existing.get("unit") or "").strip().lower()
+                    existing_category = (existing.get("category") or "").strip().lower()
                     if (
                         pending["qty"] is not None
                         and existing.get("qty") is not None
-                        and pending["unit"] == existing.get("unit")
-                        and pending["category"] == existing.get("category")
+                        and normalized_pending_unit
+                        and existing_unit == normalized_pending_unit
+                        and existing_category == normalized_pending_category
                     ):
                         combinable = existing
                         break
