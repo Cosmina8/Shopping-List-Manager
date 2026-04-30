@@ -396,17 +396,28 @@ def add_confirm(list_id: str):
 
         elif action == "combine":
             if existing_items:
-                existing = existing_items[0]
-                if (
-                    pending["qty"] is not None
-                    and existing.get("qty") is not None
-                    and pending["unit"] == existing.get("unit")
-                    and pending["category"] == existing.get("category")
-                ):
-                    new_qty = float(existing["qty"]) + float(pending["qty"])
-                    new_price = pending["price"] if pending["price"] is not None else existing.get("price")
+                combinable = None
+                normalized_pending_unit = (pending["unit"] or "").strip().lower()
+                normalized_pending_category = (pending["category"] or "").strip().lower()
 
-                    db.collection("items").document(existing["id"]).update({
+                for existing in existing_items:
+                    existing_unit = (existing.get("unit") or "").strip().lower()
+                    existing_category = (existing.get("category") or "").strip().lower()
+                    if (
+                        pending["qty"] is not None
+                        and existing.get("qty") is not None
+                        and normalized_pending_unit
+                        and existing_unit == normalized_pending_unit
+                        and existing_category == normalized_pending_category
+                    ):
+                        combinable = existing
+                        break
+
+                if combinable:
+                    new_qty = float(combinable["qty"]) + float(pending["qty"])
+                    new_price = pending["price"] if pending["price"] is not None else combinable.get("price")
+
+                    db.collection("items").document(combinable["id"]).update({
                         "qty": new_qty,
                         "price": new_price
                     })
